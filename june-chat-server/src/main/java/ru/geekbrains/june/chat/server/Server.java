@@ -27,11 +27,13 @@ public class Server {
     }
 
     public synchronized void subscribe(ClientHandler c) {
+        broadcastMessage("User " + c.getUsername() + " connected to the chat");
         clients.add(c);
     }
 
     public synchronized void unsubscribe(ClientHandler c) {
         clients.remove(c);
+        broadcastMessage("User " + c.getUsername() + " left chat");
     }
 
     public synchronized void broadcastMessage(String message) {
@@ -40,5 +42,13 @@ public class Server {
         }
     }
 
+    public synchronized boolean checkIfUsernameIsUsed(String user) {
+        for (ClientHandler c : clients) {
+            if (user.equalsIgnoreCase(c.getUsername())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

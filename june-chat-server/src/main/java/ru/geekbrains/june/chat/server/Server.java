@@ -29,11 +29,13 @@ public class Server {
     public synchronized void subscribe(ClientHandler c) {
         broadcastMessage("User " + c.getUsername() + " connected to the chat");
         clients.add(c);
+        broadcastClientsList();
     }
 
     public synchronized void unsubscribe(ClientHandler c) {
         clients.remove(c);
         broadcastMessage("User " + c.getUsername() + " left chat");
+        broadcastClientsList();
     }
 
     public synchronized void broadcastMessage(String message) {
@@ -42,12 +44,39 @@ public class Server {
         }
     }
 
-    public synchronized boolean checkIfUsernameIsUsed(String user) {
+    public synchronized void broadcastClientsList() {
+        StringBuilder builder = new StringBuilder(clients.size() * 10);
+        builder.append("/clients_list ");
+
         for (ClientHandler c : clients) {
-            if (user.equalsIgnoreCase(c.getUsername())) {
+            builder.append(c.getUsername()).append(" ");
+        }
+
+        String clientsListStr = builder.toString();
+        broadcastMessage(clientsListStr);
+    }
+
+    public synchronized boolean checkIfUsernameIsUsed(String username) {
+        for (ClientHandler c : clients) {
+            if (username.equalsIgnoreCase(c.getUsername())) {
                 return true;
             }
         }
         return false;
+    }
+
+    public synchronized void sendPrivateMessage(ClientHandler sender, String receiver, String message) {
+        if (sender.getUsername().equalsIgnoreCase(receiver)) {
+            sender.sendMessage("SERVER: Personal messages are not allowed");
+            return;
+        }
+        for (ClientHandler c : clients) {
+            if (c.getUsername().equalsIgnoreCase(receiver)) {
+                c.sendMessage("from user " + sender.getUsername() + ": " + message);
+                sender.sendMessage("to user " + receiver + ": " + message);
+                return;
+            }
+        }
+        sender.sendMessage("User " + receiver + " is not available");
     }
 }

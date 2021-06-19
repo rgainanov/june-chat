@@ -1,10 +1,9 @@
 package ru.geekbrains.june.chat.client;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
 import java.io.DataInputStream;
@@ -22,10 +21,21 @@ public class Controller {
     @FXML
     HBox msgPanel, authPanel;
 
+    @FXML
+    ListView<String> clientsListView;
+
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
 
+    public void setAuthorized(boolean authorized) {
+        msgPanel.setVisible(authorized);
+        msgPanel.setManaged(authorized);
+        authPanel.setVisible(!authorized);
+        authPanel.setManaged(!authorized);
+        clientsListView.setVisible(authorized);
+        clientsListView.setManaged(authorized);
+    }
 
     public void sendMessage() {
         try {
@@ -37,6 +47,15 @@ public class Controller {
         }
     }
 
+    public void sendCloseRequest() {
+        try {
+            if (out != null) {
+                out.writeUTF("/exit");
+            }
+        } catch (IOException e) {
+            showError("Unable to send request to the server");
+        }
+    }
 
     public void tryToAuth() {
         connect();
@@ -58,35 +77,88 @@ public class Controller {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            Thread readThread = new Thread(() -> {
-                try {
-                    while (true) {
-                        String inputMessage = in.readUTF();
-                        if (inputMessage.startsWith("/authok ")) {
-                            msgPanel.setVisible(true);
-                            msgPanel.setManaged(true);
-                            authPanel.setVisible(false);
-                            authPanel.setManaged(false);
-                            break;
-                        }
-                        chatArea.appendText(inputMessage + "\n");
-                    }
-                    while (true) {
-                        String inputMessage = in.readUTF();
-                        chatArea.appendText(inputMessage + "\n");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-            readThread.start();
+            new Thread(() -> mainClientLogic()).start();
+
         } catch (IOException e) {
             System.out.println("Unable to connect to the Server");
             System.exit(0);
         }
     }
 
+    private void mainClientLogic() {
+        try {
+            while (true) {
+                String inputMessage = in.readUTF();
+                if (inputMessage.startsWith("/exit ")) {
+                    closeConnection();
+                }
+                if (inputMessage.startsWith("/authok ")) {
+                    setAuthorized(true);
+                    break;
+                }
+                chatArea.appendText(inputMessage + "\n");
+            }
+            while (true) {
+                String inputMessage = in.readUTF();
+                if (inputMessage.startsWith("/")) {
+                    if (inputMessage.equals("/exit")) {
+                        break;
+                    }
+                    if (inputMessage.startsWith("/clients_list ")) {
+                        Platform.runLater(() -> {
+                            String[] tokens = inputMessage.split("\\s+");
+                            clientsListView.getItems().clear();
+                            for (int i = 1; i < tokens.length; i++) {
+                                clientsListView.getItems().add(tokens[i]);
+                            }
+                        });
+                    }
+                    continue;
+                }
+                chatArea.appendText(inputMessage + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            closeConnection();
+        }
+    }
+
+    private void closeConnection() {
+        setAuthorized(false);
+        try {
+            if (in != null) {
+                in.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (out != null) {
+                out.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void showError(String message) {
         new Alert(Alert.AlertType.ERROR, message, ButtonType.OK).showAndWait();
+    }
+
+    public void clientsListDoubleClick(MouseEvent mouseEvent) {
+        if (mouseEvent.getClickCount() == 2) {
+            String selectedUser = clientsListView.getSelectionModel().getSelectedItem();
+            messageField.setText("/w " + selectedUser + " ");
+            messageField.requestFocus();
+            messageField.selectEnd();
+        }
     }
 }

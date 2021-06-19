@@ -5,10 +5,14 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
 <VBox alignment="center" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="ru.geekbrains.june.chat.client.Controller">
+    <HBox VBox.vgrow="ALWAYS">
+        <TextArea fx:id="chatArea" editable="false" HBox.hgrow="ALWAYS" />
+        <ListView onMouseClicked="#clientsListDoubleClick" fx:id="clientsListView" visible="false" managed="false" minWidth="180" maxWidth="180" />
+    </HBox>
 
-    <TextArea fx:id="chatArea" editable="false" VBox.vgrow="ALWAYS" />
     <HBox fx:id="authPanel">
         <TextField promptText="Enter Username" fx:id="usernameField" HBox.hgrow="ALWAYS" onAction="#tryToAuth"/>
         <Button onAction="#tryToAuth">Auth</Button>

@@ -9,8 +9,12 @@
       fx:controller="ru.geekbrains.june.chat.client.Controller">
 
     <TextArea fx:id="chatArea" editable="false" VBox.vgrow="ALWAYS" />
-    <HBox>
-        <TextField fx:id="messageField" HBox.hgrow="ALWAYS" onAction="#sendMessage"/>
-        <Button fx:id="btn" onAction="#sendMessage" disable="true">Отправить</Button>
+    <HBox fx:id="authPanel">
+        <TextField promptText="Enter Username" fx:id="usernameField" HBox.hgrow="ALWAYS" onAction="#tryToAuth"/>
+        <Button onAction="#tryToAuth">Auth</Button>
+    </HBox>
+    <HBox fx:id="msgPanel" visible="false" managed="false">
+        <TextField promptText="Enter message" fx:id="messageField" HBox.hgrow="ALWAYS" onAction="#sendMessage"/>
+        <Button onAction="#sendMessage">Send</Button>
     </HBox>
 </VBox>

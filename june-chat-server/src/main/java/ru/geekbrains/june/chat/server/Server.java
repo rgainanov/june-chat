@@ -40,12 +40,5 @@ public class Server {
         }
     }
 
-    public synchronized boolean checkIfUsernameIsUsed(String user) {
-        for (ClientHandler c : clients) {
-            if (user.equalsIgnoreCase(c.getUsername())) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 }

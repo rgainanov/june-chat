@@ -13,7 +13,7 @@ public class ClientApp extends Application {
         Parent root = fxmlLoader.load(getClass().getResource("/chat.fxml").openStream());
         Controller controller = (Controller) fxmlLoader.getController();
 //        Parent root = FXMLLoader.load(getClass().getResource("/chat.fxml"));
-        primaryStage.setScene(new Scene(root, 600, 400));
+        primaryStage.setScene(new Scene(root, 700, 400));
         primaryStage.setTitle("June Chat Client");
         primaryStage.setOnCloseRequest(event -> controller.sendCloseRequest());
         primaryStage.show();

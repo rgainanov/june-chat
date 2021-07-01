@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Button?>
-<VBox alignment="center" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="ru.geekbrains.june.chat.client.Controller">
+<?import javafx.scene.control.ListView?>
 
-    <TextArea fx:id="chatArea" editable="false" VBox.vgrow="ALWAYS" />
-    <HBox fx:id="authPanel">
-        <TextField promptText="Enter Username" fx:id="usernameField" HBox.hgrow="ALWAYS" onAction="#tryToAuth"/>
-        <Button onAction="#tryToAuth">Auth</Button>
-    </HBox>
-    <HBox fx:id="msgPanel" visible="false" managed="false">
-        <TextField promptText="Enter message" fx:id="messageField" HBox.hgrow="ALWAYS" onAction="#sendMessage"/>
-        <Button onAction="#sendMessage">Send</Button>
-    </HBox>
+<VBox alignment="center" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.geekbrains.june.chat.client.Controller">
+   <children>
+       <TextField fx:id="usernameField" editable="false" managed="false" style="-fx-alignment: center;" visible="false">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+      </TextField>
+       <HBox VBox.vgrow="ALWAYS">
+          <children>
+              <TextArea fx:id="chatArea" editable="false" HBox.hgrow="ALWAYS" />
+              <ListView fx:id="clientsListView" managed="false" maxWidth="180" minWidth="180" onMouseClicked="#clientsListDoubleClick" visible="false" />
+          </children>
+       </HBox>
+   
+       <HBox fx:id="authPanel">
+      <children>
+              <TextField fx:id="authField" onAction="#tryToAuth" promptText="Enter Username" HBox.hgrow="ALWAYS" />
+              <Button onAction="#tryToAuth">Auth</Button>
+      </children>
+       </HBox>
+       <HBox fx:id="msgPanel" managed="false" visible="false">
+          <children>
+              <TextField fx:id="messageField" onAction="#sendMessage" promptText="Enter message" HBox.hgrow="ALWAYS" />
+              <Button onAction="#sendMessage">Send</Button>
+          </children>
+       </HBox>
+   </children>
 </VBox>

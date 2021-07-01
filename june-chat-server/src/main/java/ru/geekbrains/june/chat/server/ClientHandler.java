@@ -23,7 +23,20 @@ public class ClientHandler {
                     while (true) {
                         String inputMessage = in.readUTF();
                         if (inputMessage.startsWith("/auth ")) {
-                            username = inputMessage.split("\\s+")[1];
+                            String[] tokens = inputMessage.split("\\s+");
+                            if (tokens.length > 2) {
+                                sendMessage("SERVER: Username cannot contain spaces");
+                                continue;
+                            }
+                            if (tokens.length == 1) {
+                                sendMessage("SERVER: Please enter Username");
+                                continue;
+                            }
+                            if (server.checkIfUsernameIsUsed(tokens[1])) {
+                                sendMessage("SERVER: Username is already in use");
+                                continue;
+                            }
+                            username = tokens[1];
                             sendMessage("/authok " + username);
                             server.subscribe(this);
                             break;

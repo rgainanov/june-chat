@@ -16,10 +16,10 @@ public class Controller {
     TextArea chatArea;
 
     @FXML
-    TextField messageField, usernameField, authField;
+    TextField messageField, nicknameField, loginField, passwordField, signInLoginField, signInPasswordField, signInNickname;
 
     @FXML
-    HBox msgPanel, authPanel;
+    HBox msgPanel, authPanel, usernameHbox, signInPanel;
 
     @FXML
     ListView<String> clientsListView;
@@ -38,8 +38,22 @@ public class Controller {
         authPanel.setManaged(!authorized);
         clientsListView.setVisible(authorized);
         clientsListView.setManaged(authorized);
-        usernameField.setVisible(authorized);
-        usernameField.setManaged(authorized);
+        usernameHbox.setVisible(authorized);
+        usernameHbox.setManaged(authorized);
+
+        signInLoginField.clear();
+        signInPasswordField.clear();
+        signInNickname.clear();
+
+        loginField.clear();
+        passwordField.clear();
+    }
+
+    public void setSignInMenu(boolean signin) {
+        authPanel.setVisible(!signin);
+        authPanel.setManaged(!signin);
+        signInPanel.setManaged(signin);
+        signInPanel.setVisible(signin);
     }
 
     /*
@@ -47,11 +61,19 @@ public class Controller {
     */
     public void sendMessage() {
         try {
-            if (messageField.getText().trim().length() > 0){
+            if (messageField.getText().trim().length() > 0) {
                 out.writeUTF(messageField.getText().trim());
                 messageField.clear();
                 messageField.requestFocus();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessage(String message) {
+        try {
+            out.writeUTF(message);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,8 +101,15 @@ public class Controller {
         connect();
         try {
             // отправляем команду авторизации на сервер вместе с введённым именем пользователя
-            out.writeUTF("/auth " + authField.getText().trim());
-            authField.clear();
+            String[] loginTokens = loginField.getText().trim().split("\\s+");
+            String[] passwordTokens = passwordField.getText().trim().split("\\s+");
+            if (loginTokens.length > 1 || passwordTokens.length > 1) {
+                out.writeUTF("/auth error_spaces");
+            } else {
+                out.writeUTF("/auth " + loginField.getText().trim() + " " + passwordField.getText().trim());
+//                loginField.clear();
+//                passwordField.clear();
+            }
         } catch (IOException e) {
             showError("\nUnable to send request to the server\n");
         }
@@ -112,6 +141,11 @@ public class Controller {
         }
     }
 
+    private void showNickname(String message){
+        String username = message.split("\\s+")[1];
+        nicknameField.setText("NOTIFICATION: Your username is - " + username);
+    }
+
     private void mainClientLogic() {
         try {
             /*
@@ -125,10 +159,18 @@ public class Controller {
                 if (inputMessage.startsWith("/exit ")) {
                     closeConnection();
                 }
+                if (inputMessage.startsWith("/signin_required ")) {
+                    setSignInMenu(true);
+                    signInLoginField.setText(loginField.getText());
+                    signInPasswordField.setText(passwordField.getText());
+                    continue;
+                }
                 if (inputMessage.startsWith("/authok ")) {
+                    signInPanel.setManaged(false);
+                    signInPanel.setVisible(false);
+                    chatArea.clear();
                     setAuthorized(true);
-                    String username = inputMessage.split("\\s+")[1];
-                    usernameField.setText("NOTIFICATION: Your username is - " + username);
+                    showNickname(inputMessage);
                     break;
                 }
                 chatArea.appendText(inputMessage + "\n");
@@ -146,6 +188,11 @@ public class Controller {
                     if (inputMessage.equals("/exit")) {
                         break;
                     }
+
+                    if (inputMessage.startsWith("/update_nickname ")) {
+                        showNickname(inputMessage);
+                    }
+
                     if (inputMessage.startsWith("/clients_list ")) {
                         // для того чтобы изменять список пользователей в потоке JavaFX оборачиваем заполнение списка
                         // в поток JavaFX
@@ -170,6 +217,7 @@ public class Controller {
 
     private void closeConnection() {
         setAuthorized(false);
+        chatArea.clear();
         try {
             if (in != null) {
                 in.close();
@@ -209,6 +257,34 @@ public class Controller {
             messageField.setText("/w " + selectedUser + " ");
             messageField.requestFocus();
             messageField.selectEnd();
+        }
+    }
+
+    public void logOut() {
+        sendMessage("/exit");
+    }
+
+    public void signIn() {
+        try {
+            String[] loginTokens = signInLoginField.getText().trim().split("\\s+");
+            String[] passwordTokens = signInPasswordField.getText().trim().split("\\s+");
+            String[] nicknameTokens = signInNickname.getText().trim().split("\\s+");
+
+            if (loginTokens.length > 1 || passwordTokens.length > 1 || nicknameTokens.length > 1) {
+                out.writeUTF("/signin error_spaces");
+            } else {
+                out.writeUTF("/signin " +
+                        signInLoginField.getText().trim() +
+                        " " +
+                        signInPasswordField.getText().trim() +
+                        " " +
+                        signInNickname.getText().trim());
+//                signInLoginField.clear();
+//                signInPasswordField.clear();
+//                signInNickname.clear();
+            }
+        } catch (IOException e) {
+            showError("\nUnable to send request to the server\n");
         }
     }
 }

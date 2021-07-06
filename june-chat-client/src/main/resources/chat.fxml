@@ -1,41 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.text.Font?>
+<VBox alignment="center" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ru.geekbrains.june.chat.client.Controller">
+    <children>
+        <HBox fx:id="usernameHbox" visible="false" managed="false">
+            <TextField fx:id="nicknameField" HBox.hgrow="ALWAYS" editable="false" style="-fx-alignment: center;"
+            >
+                <font>
+                    <Font name="Arial Bold" size="14.0"/>
+                </font>
+            </TextField>
+            <Button onAction="#logOut">Log Out</Button>
+        </HBox>
+        <HBox VBox.vgrow="ALWAYS">
+            <children>
+                <TextArea fx:id="chatArea" editable="false" HBox.hgrow="ALWAYS"/>
+                <ListView fx:id="clientsListView" managed="false" maxWidth="180" minWidth="180"
+                          onMouseClicked="#clientsListDoubleClick" visible="false"/>
+            </children>
+        </HBox>
 
-<VBox alignment="center" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.geekbrains.june.chat.client.Controller">
-   <children>
-       <TextField fx:id="usernameField" editable="false" managed="false" style="-fx-alignment: center;" visible="false">
-         <font>
-            <Font name="Arial Bold" size="14.0" />
-         </font>
-      </TextField>
-       <HBox VBox.vgrow="ALWAYS">
-          <children>
-              <TextArea fx:id="chatArea" editable="false" HBox.hgrow="ALWAYS" />
-              <ListView fx:id="clientsListView" managed="false" maxWidth="180" minWidth="180" onMouseClicked="#clientsListDoubleClick" visible="false" />
-          </children>
-       </HBox>
-   
-       <HBox fx:id="authPanel">
-      <children>
-              <TextField fx:id="authField" onAction="#tryToAuth" promptText="Enter Username" HBox.hgrow="ALWAYS" />
-              <Button onAction="#tryToAuth">Auth</Button>
-      </children>
-       </HBox>
-       <HBox fx:id="msgPanel" managed="false" visible="false">
-          <children>
-              <TextField fx:id="messageField" onAction="#sendMessage" promptText="Enter message" HBox.hgrow="ALWAYS" />
-              <Button onAction="#sendMessage">Send</Button>
-          </children>
-       </HBox>
-   </children>
+        <HBox fx:id="authPanel">
+            <children>
+                <TextField fx:id="loginField" promptText="Enter Login" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="passwordField" onAction="#tryToAuth" promptText="Enter Password" HBox.hgrow="ALWAYS"/>
+                <Button onAction="#tryToAuth">Log in</Button>
+            </children>
+        </HBox>
+        <HBox fx:id="signInPanel" managed="false" visible="false">
+            <children>
+                <TextField fx:id="signInLoginField" promptText="Enter Login" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="signInPasswordField" promptText="Enter Password" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="signInNickname" onAction="#signIn" promptText="Enter Nickname" HBox.hgrow="ALWAYS"/>
+                <Button onAction="#tryToAuth">Sign in</Button>
+            </children>
+        </HBox>
+        <HBox fx:id="msgPanel" managed="false" visible="false">
+            <children>
+                <TextField fx:id="messageField" onAction="#sendMessage" promptText="Enter message" HBox.hgrow="ALWAYS"/>
+                <Button onAction="#sendMessage">Send</Button>
+            </children>
+        </HBox>
+    </children>
 </VBox>

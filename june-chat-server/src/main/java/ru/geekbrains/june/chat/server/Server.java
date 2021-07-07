@@ -46,7 +46,7 @@ public class Server {
     public synchronized void subscribe(ClientHandler c) {
         broadcastMessage("\nUser " + c.getNickname() + " connected to the chat\n");
         clients.add(c);
-        c.sendHelpMessage();
+//        c.sendHelpMessage();
         broadcastClientsList();
     }
 

@@ -60,3 +60,13 @@ gainanov: f
 gainanov: sdf
 gainanov: ds
 gainanov: new last row2
+
+User kate connected to the chat
+
+kate: new last row222
+
+User kate left chat
+
+
+User kate connected to the chat
+

@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientHandler {
     private Server server;
@@ -14,6 +16,7 @@ public class ClientHandler {
     private String nickname;
     private DataInputStream in;
     private DataOutputStream out;
+    private ExecutorService cachedService;
 
     public ClientHandler(Server server, Socket socket) {
         try {
@@ -23,7 +26,11 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
 
-            new Thread(this::logic).start();
+            cachedService = Executors.newCachedThreadPool();
+            cachedService.execute(() -> {
+                logic();
+            });
+//            new Thread(this::logic).start();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -217,6 +224,7 @@ public class ClientHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        cachedService.shutdown();
     }
 
     public void sendHelpMessage() {

@@ -58,7 +58,6 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
                 results[0] = rs.getString("login");
                 results[1] = rs.getString("password");
                 results[2] = rs.getString("nickname");
-                System.out.println(Arrays.toString(results));
                 return results;
             }
         } catch (SQLException e) {

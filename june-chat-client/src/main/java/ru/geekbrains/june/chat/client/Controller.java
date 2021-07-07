@@ -27,6 +27,7 @@ public class Controller {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    private LoggingHandler loggingHandler;
 
     /*
         вспомогательный метод, отвечает за скрытие/открытие строки ввода/вывода имени пользователя
@@ -110,7 +111,6 @@ public class Controller {
             socket = new Socket("localhost", 8189);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-
             new Thread(this::mainClientLogic).start();
 
         } catch (IOException e) {
@@ -119,12 +119,16 @@ public class Controller {
         }
     }
 
-    private void showNickname(String message){
-        String username = message.split("\\s+")[1];
+    private void showNickname(String username) {
         nicknameField.setText("NOTIFICATION: Your username is - " + username);
     }
 
     private void mainClientLogic() {
+//        chatArea.textProperty().addListener((observable, oldValue, newValue) -> {
+//                    System.out.println("chat area listener");
+//                    chatArea.setScrollTop(Double.MAX_VALUE);
+//                }
+//        );
         try {
             while (true) {
                 String inputMessage = in.readUTF();
@@ -138,11 +142,20 @@ public class Controller {
                     continue;
                 }
                 if (inputMessage.startsWith("/authok ")) {
+                    String username = inputMessage.split("\\s+")[1];
+                    loggingHandler = new LoggingHandler(username);
                     signInPanel.setManaged(false);
                     signInPanel.setVisible(false);
                     chatArea.clear();
                     setAuthorized(true);
-                    showNickname(inputMessage);
+                    showNickname(username);
+                    Platform.runLater(() -> {
+                        for (String msg : loggingHandler.getChatHistoryLastNRows(100)) {
+                            chatArea.appendText(msg + "\n");
+                        }
+                        chatArea.appendText("\nNOTIFICATION: History Loaded \n\n");
+                        chatArea.selectEnd();
+                    });
                     break;
                 }
                 chatArea.appendText(inputMessage + "\n");
@@ -168,9 +181,16 @@ public class Controller {
                             }
                         });
                     }
+
+                    if (inputMessage.startsWith("/info_message ")) {
+                        String[] tokens = inputMessage.split("\\s+", 2);
+                        chatArea.appendText(tokens[1]);
+                    }
+
                     continue;
                 }
                 chatArea.appendText(inputMessage + "\n");
+                loggingHandler.writeLogs(inputMessage);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -181,6 +201,7 @@ public class Controller {
 
     private void closeConnection() {
         setAuthorized(false);
+        loggingHandler.close();
         chatArea.clear();
         try {
             if (in != null) {

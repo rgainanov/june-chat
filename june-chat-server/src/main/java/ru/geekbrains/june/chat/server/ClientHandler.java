@@ -220,7 +220,7 @@ public class ClientHandler {
     }
 
     public void sendHelpMessage() {
-        String message = "\nWelcome to the June Chat\n\tBellow command are available for you:\n\t" +
+        String message = "/info_message \nWelcome to the June Chat\n\tBellow command are available for you:\n\t" +
                 "/exit - is used for when you want to leave chat\n\t" +
                 "/update_nickname <new nickname> - is used to update your nickname\n\t" +
                 "/update_password <new password> - is used to update your password\n\t" +

@@ -150,7 +150,7 @@ public class Controller {
                     setAuthorized(true);
                     showNickname(username);
                     Platform.runLater(() -> {
-                        for (String msg : loggingHandler.getLastOneHundredMessages()) {
+                        for (String msg : loggingHandler.getChatHistoryLastNRows(100)) {
                             chatArea.appendText(msg + "\n");
                         }
                         chatArea.appendText("\nNOTIFICATION: History Loaded \n\n");

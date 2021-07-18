@@ -1,9 +1,11 @@
 package ru.geekbrains.june.chat.server;
 
 import java.sql.*;
-import java.util.Arrays;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class DbAuthenticationProvider implements AuthenticationProvider {
+    private static final Logger LOGGER = LogManager.getLogger(DbAuthenticationProvider.class);
     private Connection conn;
     private Statement stmt;
 
@@ -11,7 +13,9 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
     public void start() {
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:javadb.db");
+            LOGGER.info("DBHandler Connected to DB");
             stmt = conn.createStatement();
+            LOGGER.info("DBHandler Statement created");
             stmt.executeUpdate(
                     "create table if not exists users (" +
                             "id integer primary key autoincrement," +
@@ -19,8 +23,10 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
                             "password text," +
                             "nickname text)"
             );
+
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("DBHandler error connecting to db - " + e);
         }
     }
 
@@ -30,16 +36,21 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
             if (stmt != null) {
                 stmt.close();
             }
+            LOGGER.info("DBHandler Statement closed");
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("DBHandler error closing Statement - " + e);
         }
         try {
             if (conn != null) {
                 conn.close();
             }
+            LOGGER.info("DBHandler Connection closed");
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("DBHandler error closing Connection - " + e);
         }
+        LOGGER.info("DBHandler Disconnected from DB");
     }
 
     @Override
@@ -53,6 +64,7 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
         ) {
             ps.setString(1, login);
             ResultSet rs = ps.executeQuery();
+            LOGGER.info("DBHandler getUserByField executed");
             if (rs.next()) {
                 String[] results = new String[3];
                 results[0] = rs.getString("login");
@@ -61,7 +73,8 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
                 return results;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("DBHandler error in getUserByField - " + e);
         }
         return null;
     }
@@ -78,11 +91,13 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
             ps.setString(2, password);
             ps.setString(3, nickname);
             int rowsAffected = ps.executeUpdate();
+            LOGGER.info("DBHandler addUserRecord executed");
             if (rowsAffected > 0) {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("DBHandler error in addUserRecord - " + e);
         }
 
         return false;
@@ -100,11 +115,13 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
             ps.setString(1, newValue);
             ps.setString(2, login);
             int rowsAffected = ps.executeUpdate();
+            LOGGER.info("DBHandler updateUserRecord executed");
             if (rowsAffected > 0) {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("DBHandler error in updateUserRecord - " + e);
         }
         return false;
     }

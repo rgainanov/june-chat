@@ -3,12 +3,13 @@ package ru.geekbrains.june.chat.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Server {
+    private static final Logger LOGGER = LogManager.getLogger(Server.class);
     private AuthenticationProvider authenticationProvider;
     private List<ClientHandler> clients;
 
@@ -22,11 +23,13 @@ public class Server {
             this.clients = new ArrayList<>();
 
             ServerSocket serverSocket = new ServerSocket(8189);
-            System.out.println("Server Started. Awaiting clients...");
+//            System.out.println("Server Started. Awaiting clients...");
+            LOGGER.info("Server Started. Awaiting clients...");
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("New Client Connected");
+                LOGGER.info("New Client Connected");
+//                System.out.println("New Client Connected");
                 new ClientHandler(this, socket);
             }
         } catch (IOException e) {
@@ -37,6 +40,7 @@ public class Server {
     public synchronized void refreshClientList(ClientHandler c, String oldNickname) {
         for (int i = 0; i < clients.size(); i++) {
             if (!clients.get(i).getLogin().equals(c.getLogin())) {
+                LOGGER.trace("SERVER: User " + oldNickname + " changed Nickname to -> " + c.getNickname());
                 clients.get(i).sendMessage("SERVER: User " + oldNickname + " changed Nickname to -> " + c.getNickname());
             }
         }

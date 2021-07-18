@@ -1,0 +1,15 @@
+INFO  2021-07-18 11:19:50 [main] ru.geekbrains.june.chat.server.Server (Server.java:27) - Server Started. Awaiting clients...
+INFO  2021-07-18 11:19:59 [main] ru.geekbrains.june.chat.server.Server (Server.java:31) - New Client Connected
+INFO  2021-07-18 11:20:00 [pool-2-thread-1] ru.geekbrains.june.chat.server.DbAuthenticationProvider (DbAuthenticationProvider.java:16) - DBHandler Connected to DB
+INFO  2021-07-18 11:20:00 [pool-2-thread-1] ru.geekbrains.june.chat.server.DbAuthenticationProvider (DbAuthenticationProvider.java:18) - DBHandler Statement created
+INFO  2021-07-18 11:20:00 [pool-2-thread-1] ru.geekbrains.june.chat.server.DbAuthenticationProvider (DbAuthenticationProvider.java:67) - DBHandler getUserByField executed
+INFO  2021-07-18 11:20:00 [pool-2-thread-1] ru.geekbrains.june.chat.server.ClientHandler (ClientHandler.java:152) - ClientHandler User - roman111 Successfully Authenticated
+TRACE 2021-07-18 11:20:00 [pool-2-thread-1] ru.geekbrains.june.chat.server.ClientHandler (ClientHandler.java:206) - gainanov - /authok roman111
+TRACE 2021-07-18 11:20:00 [pool-2-thread-1] ru.geekbrains.june.chat.server.ClientHandler (ClientHandler.java:206) - gainanov - /clients_list roman111 
+TRACE 2021-07-18 11:20:08 [pool-2-thread-1] ru.geekbrains.june.chat.server.ClientHandler (ClientHandler.java:206) - gainanov - gainanov: hello
+TRACE 2021-07-18 11:20:10 [pool-2-thread-1] ru.geekbrains.june.chat.server.ClientHandler (ClientHandler.java:206) - gainanov - gainanov: test1
+TRACE 2021-07-18 11:20:12 [pool-2-thread-1] ru.geekbrains.june.chat.server.ClientHandler (ClientHandler.java:206) - gainanov - gainanov: test2
+TRACE 2021-07-18 11:20:18 [pool-2-thread-1] ru.geekbrains.june.chat.server.ClientHandler (ClientHandler.java:206) - gainanov - /exit
+INFO  2021-07-18 11:20:18 [pool-2-thread-1] ru.geekbrains.june.chat.server.DbAuthenticationProvider (DbAuthenticationProvider.java:39) - DBHandler Statement closed
+INFO  2021-07-18 11:20:18 [pool-2-thread-1] ru.geekbrains.june.chat.server.DbAuthenticationProvider (DbAuthenticationProvider.java:48) - DBHandler Connection closed
+INFO  2021-07-18 11:20:18 [pool-2-thread-1] ru.geekbrains.june.chat.server.DbAuthenticationProvider (DbAuthenticationProvider.java:53) - DBHandler Disconnected from DB

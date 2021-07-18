@@ -4,11 +4,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ClientHandler {
+    private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
     private Server server;
     private Socket socket;
     private String login;
@@ -32,7 +34,8 @@ public class ClientHandler {
             });
 //            new Thread(this::logic).start();
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("ClientHandler INIT error - " + e);
         }
     }
 
@@ -50,7 +53,8 @@ public class ClientHandler {
             while (!authMessageLogic(in.readUTF())) ;
             while (regularMessageLogic(in.readUTF())) ;
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("ClientHandler Input Stream error - " + e);
         } finally {
             server.unsubscribe(this);
             closeConnection();
@@ -145,6 +149,7 @@ public class ClientHandler {
             }
             if (selectedUser[1].equals(password)) {
                 nickname = selectedUser[2];
+                LOGGER.info("ClientHandler User - " + nickname + " Successfully Authenticated");
                 sendMessage("/authok " + nickname);
 
                 server.subscribe(this);
@@ -180,12 +185,14 @@ public class ClientHandler {
 
             boolean userAddResponse = server.getAuthenticationProvider().addUserRecord(login, password, nickname);
             if (userAddResponse) {
+                LOGGER.info("ClientHandler User - " + nickname + " Successfully signed in");
                 sendMessage("\nSERVER: Successfully signed in\n");
                 sendMessage("/authok " + nickname);
                 server.subscribe(this);
                 return true;
             } else {
                 sendMessage("\nSERVER: Error Occurred, please try again\n");
+                LOGGER.warn("ClientHandler User - " + nickname + " Error Occurred during Sign in");
             }
         }
         sendMessage("\nSERVER: Please Authorize before continue\n");
@@ -196,9 +203,11 @@ public class ClientHandler {
 
     public void sendMessage(String message) {
         try {
+            LOGGER.trace(login + " - " + message);
             out.writeUTF(message);
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("SEND MESSAGE ERROR - " + e);
         }
     }
 
@@ -208,21 +217,25 @@ public class ClientHandler {
                 in.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("ClientHandler Input Stream close error - " + e);
+
         }
         try {
             if (out != null) {
                 out.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("ClientHandler Output Stream close error - " + e);
         }
         try {
             if (socket != null) {
                 socket.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("ClientHandler Socket close error - " + e);
         }
         cachedService.shutdown();
     }
@@ -240,7 +253,8 @@ public class ClientHandler {
         try {
             out.writeUTF(message);
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            LOGGER.error("ClientHandler Help Message send error - " + e);
         }
     }
 }
